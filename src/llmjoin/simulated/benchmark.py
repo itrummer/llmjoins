@@ -3,7 +3,7 @@ Created on Feb 24, 2024
 
 @author: immanueltrummer
 '''
-from llmjoin.simulator import run_benchmark
+from llmjoin.simulated.simulator import run_benchmark
 
 
 if __name__ == '__main__':
