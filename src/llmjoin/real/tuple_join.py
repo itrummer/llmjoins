@@ -6,6 +6,7 @@ Created on Feb 24, 2024
 import argparse
 import openai
 import pandas
+import time
 
 
 def create_prompt(tuple1, tuple2, predicate):
@@ -40,11 +41,18 @@ def tuple_join(df1, df2, predicate, model):
     Returns:
         Tuple: statistics, join result.
     """
-    results = []
-    stats = []
     client = openai.OpenAI()
+    nr_pairs = len(df1) * len(df2)
+    pair_counter = 0    
+    results = []
+    stats = []    
+    
     for row1 in df1.rows():
         for row2 in df2.rows():
+            pair_counter += 1
+            print(f'Considering tuple pair {pair_counter}/{nr_pairs} ...')
+
+            start_s = time.time()
             tuple1 = row1['text']
             tuple2 = row2['text']
             prompt = create_prompt(tuple1, tuple2, predicate)
@@ -58,9 +66,12 @@ def tuple_join(df1, df2, predicate, model):
             
             tokens_read = response['usage']['prompt_tokens']
             tokens_written = response['usage']['completion_tokens']
+            total_s = time.time() - start_s
+            
             stats += [
                 {'tokens_read':tokens_read, 
-                 'tokens_written':tokens_written}]
+                 'tokens_written':tokens_written,
+                 'seconds':total_s}]
     
     return pandas.DataFrame(stats), pandas.DataFrame(results)
 
