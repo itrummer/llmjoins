@@ -21,10 +21,9 @@ def create_prompt(tuple1, tuple2, predicate):
         Prompt for tuple comparison.
     """
     parts = []
-    parts += ['Does the following condition hold for the two text snippets ("Yes"/"No")?']
-    parts += [f'Condition: {predicate}']
-    parts += [f'Snippet 1: {tuple1}']
-    parts += [f'Snippet 2: {tuple2}']
+    parts += [f'Is the following true ("Yes"/"No"): {predicate}?']
+    parts += [f'Text 1: {tuple1}']
+    parts += [f'Text 2: {tuple2}']
     parts += ['Answer:']
     return '\n'.join(parts)
 
@@ -41,31 +40,33 @@ def tuple_join(df1, df2, predicate, model):
     Returns:
         Tuple: statistics, join result.
     """
-    client = openai.OpenAI()
     nr_pairs = len(df1) * len(df2)
     pair_counter = 0    
     results = []
     stats = []    
     
-    for row1 in df1.rows():
-        for row2 in df2.rows():
+    for _, row1 in df1.iterrows():
+        for _, row2 in df2.iterrows():
             pair_counter += 1
-            print(f'Considering tuple pair {pair_counter}/{nr_pairs} ...')
+            print(f'\nConsidering tuple pair {pair_counter}/{nr_pairs} ...')
 
             start_s = time.time()
             tuple1 = row1['text']
             tuple2 = row2['text']
             prompt = create_prompt(tuple1, tuple2, predicate)
-            messages = [{'role':'user', 'content':prompt}]
-            response = client.chat.completions().create(
-                messages=messages, model=model, max_tokens=1)
+            print(f'Prompt:\n---\n{prompt}\n---')
             
-            answer = response['choices'][0]['content']
+            messages = [{'role':'user', 'content':prompt}]
+            response = client.chat.completions.create(
+                messages=messages, model=model, max_tokens=1, temperature=0)
+            
+            answer = response.choices[0].message.content
+            print(f'Answer: {answer}')
             if answer == 'Yes':
                 results += [{'tuple1':tuple1, 'tuple2':tuple2}]
             
-            tokens_read = response['usage']['prompt_tokens']
-            tokens_written = response['usage']['completion_tokens']
+            tokens_read = response.usage.prompt_tokens
+            tokens_written = response.usage.completion_tokens
             total_s = time.time() - start_s
             
             stats += [
@@ -88,10 +89,10 @@ if __name__ == '__main__':
     parser.add_argument('result_out', type=str, help='Path for result')
     args = parser.parse_args()
     
-    openai.api_key = args.ai_key
+    client = openai.OpenAI(api_key=args.ai_key, timeout=10)
     df1 = pandas.read_csv(args.input1)
     df2 = pandas.read_csv(args.input2)
     
-    statistics, result = tuple_join(df1, df2, args.predicate)
+    statistics, result = tuple_join(df1, df2, args.predicate, args.model)
     statistics.to_csv(args.stats_out)
     result.to_csv(args.result_out)
