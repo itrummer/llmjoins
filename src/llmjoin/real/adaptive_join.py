@@ -6,7 +6,7 @@ Created on Feb 24, 2024
 from llmjoin.real.block_join import block_join
 
 
-def adaptive_join(client, df1, df2, predicate, model, estimate=0.01):
+def adaptive_join(client, df1, df2, predicate, model, estimate=0.001):
     """ Perform block join with adaptive selectivity estimates.
     
     Args:
