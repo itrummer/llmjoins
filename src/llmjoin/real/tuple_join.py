@@ -28,10 +28,11 @@ def create_prompt(tuple1, tuple2, predicate):
     return '\n'.join(parts)
 
 
-def tuple_join(df1, df2, predicate, model):
+def tuple_join(client, df1, df2, predicate, model):
     """ Perform tuple join.
     
     Args:
+        client: OpenAI client.
         df1: first input table.
         df2: second input table.
         predicate: join predicate.
@@ -74,7 +75,7 @@ def tuple_join(df1, df2, predicate, model):
                  'tokens_written':tokens_written,
                  'seconds':total_s}]
     
-    return pandas.DataFrame(stats), pandas.DataFrame(results)
+    return stats, results
 
 
 if __name__ == '__main__':
@@ -93,6 +94,8 @@ if __name__ == '__main__':
     df1 = pandas.read_csv(args.input1)
     df2 = pandas.read_csv(args.input2)
     
-    statistics, result = tuple_join(df1, df2, args.predicate, args.model)
+    statistics, result = tuple_join(client, df1, df2, args.predicate, args.model)
+    statistics = pandas.DataFrame(statistics)
+    result = pandas.DataFrame(result)
     statistics.to_csv(args.stats_out)
     result.to_csv(args.result_out)

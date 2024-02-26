@@ -20,13 +20,18 @@ def analyze_results(reference, results):
     ref_tuples = set(ref_rows['resultpair'])
     nr_refs = len(ref_tuples)
     
+    print(f'References: {ref_tuples}')
+    
     nr_correct = 0
     nr_incorrect = 0
     for _, row in results.iterrows():
         result_tuple = (row['tuple1'], row['tuple2'])
+        print(result_tuple)
         if result_tuple in ref_tuples:
+            print('Correct!')
             nr_correct += 1
         else:
+            print('Incorrect!')
             nr_incorrect += 1
     
     nr_results = len(results)

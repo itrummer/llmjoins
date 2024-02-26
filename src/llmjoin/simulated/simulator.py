@@ -7,6 +7,8 @@ import argparse
 import math
 import pandas
 
+from llmjoin.common.tuning import optimal_block_size
+
 
 def extract_range(range_str):
     """ Extracts range from string representation.
@@ -68,11 +70,7 @@ def simulate_block_join(
     Returns:
         A dictionary with simulation results.
     """
-    estimate = max(estimate, 0.0000001)
-    b1 = math.floor(
-        (math.sqrt(s1*s1*s2*s2+s1*s2*s3*estimate*(t-p))-s1*s2)/
-        (s1*s3*estimate))
-    b2 = math.floor(((t-p)-b1*s1)/(s2+b1*s3*estimate))
+    b1, b2 = optimal_block_size(s1, s2, s3, t, p, estimate)
     prompt_size = p+b1*s1+b2*s2
     output_size = b1*b2*sigma*s3
     
