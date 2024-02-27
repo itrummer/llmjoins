@@ -31,5 +31,6 @@ def adaptive_join(client, df1, df2, predicate, model, estimate=0.001):
         all_stats += stats
         overflow = any([s['overflow'] for s in stats])
         estimate *= 4
+        print(f'*** New estimate: {estimate} ***')
     
     return all_stats, result

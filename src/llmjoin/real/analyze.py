@@ -20,18 +20,18 @@ def analyze_results(reference, results):
     ref_tuples = set(ref_rows['resultpair'])
     nr_refs = len(ref_tuples)
     
-    print(f'References: {ref_tuples}')
+    #print(f'References: {ref_tuples}')
     
     nr_correct = 0
     nr_incorrect = 0
     for _, row in results.iterrows():
         result_tuple = (row['tuple1'], row['tuple2'])
-        print(result_tuple)
+        #print(result_tuple)
         if result_tuple in ref_tuples:
-            print('Correct!')
+            #print('Correct!')
             nr_correct += 1
         else:
-            print('Incorrect!')
+            #print('Incorrect!')
             nr_incorrect += 1
     
     nr_results = len(results)
@@ -54,11 +54,13 @@ def analyze_stats(stats):
     tokens_read = stats['tokens_read'].sum()
     tokens_written = stats['tokens_written'].sum()
     dollars = tokens_read * 0.03/1000 + tokens_written * 0.06/1000
+    nr_prompts = len(stats)
     
     print(f'Tokens read:   \t{tokens_read}')
     print(f'Tokens written:\t{tokens_written}')
     print(f'Seconds:       \t{seconds}')
     print(f'Dollars:       \t{dollars}')
+    print(f'#Prompts:      \t:{nr_prompts}')
 
 
 if __name__ == '__main__':

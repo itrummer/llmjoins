@@ -10,12 +10,8 @@ from llmjoin.common.tuning import optimal_block_size
 
 
 encoder = tiktoken.encoding_for_model('gpt-4')
-t = 4096
-
-
-class JoinOverflow(BaseException):
-    """ Used if join output exceeds limits. """
-    pass
+#t = 4096
+t = 2000
 
 
 def token_size(text):
@@ -30,7 +26,7 @@ def token_size(text):
     return len(encoder.encode(text))
 
 
-def avg_tuple_size(df):
+def tuple_size(df):
     """ Calculates average token size of tuples.
     
     Args:
@@ -56,7 +52,7 @@ def create_prompt(block_1, block_2, predicate):
     parts = []
     parts += [
         ('Find indexes x,y where x is the number of an entry in collection 1 '
-         f'and y the number of an entry in collection 2 such that {predicate}!')]
+         f'and y the number of an entry in collection 2 such that {predicate} (make sure to catch all pairs!)!')]
     parts += ['Separate index pairs by semicolons.']
     parts += ['Write "Finished" after the last pair!']
     parts += ['Text Collection 1:']
@@ -138,26 +134,34 @@ def join_two_blocks(client, block_1, block_2, predicate, model):
     print(f'---\n{prompt}\n---')
     messages = [{'role':'user', 'content':prompt}]
     max_tokens = t - token_size(prompt)
-    response = client.chat.completions.create(
-        messages=messages, model=model, 
-        max_tokens=max_tokens, temperature=0,
-        stop=['Finished'])
-    print(response)
     
-    answer = response.choices[0].message.content
-    print(f'Answer: {answer}')
+    if max_tokens >= 1:
+        response = client.chat.completions.create(
+            messages=messages, model=model, 
+            max_tokens=max_tokens, temperature=0,
+            stop=['Finished'])
+        print(response)
+        
+        answer = response.choices[0].message.content
+        print(f'Answer: {answer}')
+        overflow = not (response.choices[0].finish_reason == 'stop')
+        print(f'Overflow: {overflow}\n')
+        tokens_read = response.usage.prompt_tokens
+        tokens_written = response.usage.completion_tokens
+        results = process_answer(answer, block_1, block_2)
+    else:
+        tokens_read = 0
+        tokens_written = 0
+        overflow = True
+        results = []
+    
     total_s = time.time() - start_s
-    overflow = not (response.choices[0].finish_reason == 'stop')
-    print(f'Overflow: {overflow}\n')
-    tokens_read = response.usage.prompt_tokens
-    tokens_written = response.usage.completion_tokens
     stats = {
         'tokens_read':tokens_read, 
         'tokens_written':tokens_written,
         'seconds':total_s,
         'overflow':overflow}
-    
-    results = process_answer(answer, block_1, block_2)
+
     return stats, results
 
 
@@ -175,8 +179,8 @@ def block_join(client, df1, df2, predicate, model, estimate=1):
     Returns:
         A tuple: (performance statistics, join result).
     """
-    s1 = avg_tuple_size(df1)
-    s2 = avg_tuple_size(df2)
+    s1 = tuple_size(df1)
+    s2 = tuple_size(df2)
     s3 = 4
     
     static_prompt = create_prompt([], [], predicate)
