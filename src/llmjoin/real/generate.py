@@ -11,16 +11,16 @@ import typing
 encoder = tiktoken.encoding_for_model('gpt-4')
 
 
-def inconsistency_benchmark():
-    """ Generates join input and output files for inconsistency scenario. 
+def inconsistency_benchmark(names, variant):
+    """ Generates join input and output files for inconsistency scenario.
     
     The goal of the join is to find statements that are inconsistencies
     with information discussed in a collection of emails.
-    """
-    names = [
-        'Joe', 'Martin', 'Jane', 'Julia', 'Jeff', 
-        'Victor', 'Bob', 'Alice', 'Rosy', 'Bella']
     
+    Args:
+        names: first names of people.
+        variant: name of benchmark variant.
+    """
     statements = []
     for name in names:
         statement = f'{name}: "I first heard about the losses in February 2022."'
@@ -49,9 +49,22 @@ def inconsistency_benchmark():
                         inconsistent = True
             results += [{'text1':statement, 'text2':email, 'joins':inconsistent}]
     
-    pandas.DataFrame({'text':statements}).to_csv('testdata/statements.csv')
-    pandas.DataFrame({'text':emails}).to_csv('testdata/emails.csv')
-    pandas.DataFrame(results).to_csv('testdata/inconsistencies.csv')
+    statements_path = f'testdata/statements{variant}.csv'
+    emails_path = f'testdata/emails{variant}.csv'
+    results_path = f'testdata/inconsistencies{variant}.csv'
+    pandas.DataFrame({'text':statements}).to_csv(statements_path)
+    pandas.DataFrame({'text':emails}).to_csv(emails_path)
+    pandas.DataFrame(results).to_csv(results_path)
+
+
+def inconsistency_benchmarks():
+    """ Generates benchmarks on spotting inconsistent statements. """
+    few_names = [
+        'Joe', 'Martin', 'Jane', 'Julia', 'Jeff', 
+        'Victor', 'Bob', 'Alice', 'Rosy', 'Bella']
+    inconsistency_benchmark(few_names, '')
+    many_names = list(pandas.read_csv('testdata/names.csv')['name'][:100])
+    inconsistency_benchmark(many_names, 'XXL')
 
 
 def movie_benchmarks():
@@ -174,11 +187,7 @@ def ads_benchmark():
     searches = []
     for material in materials:
         for color in colors:
-            for negations in [
-                [False, False]
-                # , [False, True], 
-                # [True, False], [True, True],
-                ]:
+            for negations in [[False, False]]:
                 properties = [material, color]
                 search = Search(properties, negations)
                 searches.append(search)
@@ -199,6 +208,6 @@ def ads_benchmark():
 
 if __name__ == '__main__':
     
-    inconsistency_benchmark()
+    inconsistency_benchmarks()
     movie_benchmarks()
     ads_benchmark()

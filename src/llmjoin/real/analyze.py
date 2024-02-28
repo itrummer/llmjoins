@@ -54,7 +54,10 @@ def analyze_stats(stats):
     tokens_read = stats['tokens_read'].sum()
     tokens_written = stats['tokens_written'].sum()
     dollars = tokens_read * 0.03/1000 + tokens_written * 0.06/1000
-    nr_prompts = len(stats)
+    if 'overflow' in stats.columns:
+        nr_prompts = len(stats[stats['overflow'] == False])
+    else:
+        nr_prompts = len(stats)
     
     print(f'Tokens read:   \t{tokens_read}')
     print(f'Tokens written:\t{tokens_written}')

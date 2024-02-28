@@ -137,12 +137,24 @@ def join_two_blocks(client, block_1, block_2, predicate, model):
     max_tokens = t - token_size(prompt)
     
     if max_tokens >= 1:
-        response = client.chat.completions.create(
-            messages=messages, model=model, 
-            max_tokens=max_tokens, temperature=0,
-            stop=['Finished'])
-        print(response)
         
+        max_retries = 3
+        for nr_retries in range(max_retries+1):
+            try:
+                response = client.chat.completions.create(
+                    messages=messages, model=model, 
+                    max_tokens=max_tokens, temperature=0,
+                    stop=['Finished'])
+                break
+            except Exception as e:
+                print(f'Exception while calling OpenAI model: {e}')
+                print(f'Used {nr_retries} retries.')
+                if nr_retries < max_retries:
+                    time.sleep(5**nr_retries)
+                else:
+                    raise BaseException('Cannot contact OpenAI!')
+            
+        print(response)
         answer = response.choices[0].message.content
         print(f'Answer: {answer}')
         overflow = not (response.choices[0].finish_reason == 'stop')
