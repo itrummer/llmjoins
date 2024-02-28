@@ -52,7 +52,8 @@ def create_prompt(block_1, block_2, predicate):
     parts = []
     parts += [
         ('Find indexes x,y where x is the number of an entry in collection 1 '
-         f'and y the number of an entry in collection 2 such that {predicate} (make sure to catch all pairs!)!')]
+         f'and y the number of an entry in collection 2 such that {predicate} '
+         '(make sure to catch all pairs!)!')]
     parts += ['Separate index pairs by semicolons.']
     parts += ['Write "Finished" after the last pair!']
     parts += ['Text Collection 1:']

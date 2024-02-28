@@ -3,6 +3,7 @@ Created on Feb 27, 2024
 
 @author: immanueltrummer
 '''
+from argparse import ArgumentParser
 from llmjoin.real.analyze import analyze_stats
 from llmjoin.real.analyze import analyze_results
 from pandas import read_csv
@@ -10,16 +11,21 @@ from pathlib import Path
 
 
 if __name__ == '__main__':
+    
+    parser = ArgumentParser()
+    parser.add_argument('dir', type=str, help='Path to result directory')
+    args = parser.parse_args()
 
     for scenario, ref_name in [
         ('inconsistency', 'inconsistencies.csv'), 
-        ('same_review', 'same_reviews.csv'),]:
+        ('same_review', 'same_reviews.csv'),
+        ('ad_matches', 'ad_matches_search.csv')]:
         for op_name in ['adaptive_join', 'block_join', 'tuple_join']:
             print(f'*** {scenario} - {op_name} ***')
             
             prefix = f'{op_name}_{scenario}_'
             ref_path = Path('testdata') / ref_name
-            results_dir = Path('testresults')
+            results_dir = Path(args.dir)
             result_path = results_dir / f'{prefix}results.csv'
             stats_path = results_dir / f'{prefix}stats.csv'
             

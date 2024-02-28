@@ -22,8 +22,8 @@ def run_benchmark(client, df1, df2, predicate, scenario):
         scenario: scenario name (used in names of output files).
     """
     for join_op, op_name in [
-        # (adaptive_join, 'adaptive_join'),
-        # (block_join, 'block_join'),
+        (adaptive_join, 'adaptive_join'),
+        (block_join, 'block_join'),
         (tuple_join, 'tuple_join'),
         ]:
     
@@ -45,14 +45,18 @@ if __name__ == '__main__':
     
     client = openai.OpenAI(api_key=args.ai_key, timeout=20)
     model = 'gpt-4'
+    
+    ads = pandas.read_csv('testdata/ads.csv')
+    searches = pandas.read_csv('testdata/searches.csv')
+    predicate = 'the search matches the offer precisely'
+    run_benchmark(client, ads, searches, predicate, 'ad_matches')
 
     reviews_1 = pandas.read_csv('testdata/reviews_1.csv')
     reviews_2 = pandas.read_csv('testdata/reviews_2.csv')
-    #predicate = 'The two reviews express the same sentiment'
     predicate = 'both reviews are positive or both are negative'
     run_benchmark(client, reviews_1, reviews_2, predicate, 'same_review')
-
-    # emails = pandas.read_csv('testdata/emails.csv')
-    # statements = pandas.read_csv('testdata/statements.csv')
-    # predicate = 'The two texts contradict each other'
-    # run_benchmark(client, statements, emails, predicate, 'inconsistency')
+    
+    emails = pandas.read_csv('testdata/emails.csv')
+    statements = pandas.read_csv('testdata/statements.csv')
+    predicate = 'The two texts contradict each other'
+    run_benchmark(client, statements, emails, predicate, 'inconsistency')

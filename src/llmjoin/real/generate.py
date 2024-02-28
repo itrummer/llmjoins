@@ -3,8 +3,10 @@ Created on Feb 24, 2024
 
 @author: immanueltrummer
 '''
+import dataclasses
 import pandas
 import tiktoken
+import typing
 
 encoder = tiktoken.encoding_for_model('gpt-4')
 
@@ -53,7 +55,7 @@ def inconsistency_benchmark():
 
 
 def movie_benchmarks():
-    """ Generates benchmarks matching reviews, based on sentiment. """
+    """ Generates benchmarks focused on matching reviews. """
     
     def shorten_review(review):
         """ Shortens review if above 100 tokens.
@@ -100,7 +102,103 @@ def movie_benchmarks():
     pandas.DataFrame(different_results).to_csv('testdata/different_reviews.csv')
 
 
+def ads_benchmark():
+    """ Generates benchmark about matching ads to searches. """
+    
+    @dataclasses.dataclass
+    class Ad():
+        """ Represents an add. """
+        properties: typing.List[str]
+        """ Material, color. """
+        
+        def __str__(self):
+            """ Generates text representation of ad.
+            
+            Returns:
+                ad representation in natural language.
+            """
+            material, color = self.properties
+            return f'Offering table that is {material} and {color}.'
+
+    @dataclasses.dataclass
+    class Search():
+        """ Represents a search. """
+        properties: typing.List[str]
+        """ Material color. """
+        negations: typing.List[bool]
+        """ Whether a property is negated. """
+        
+        def matches(self, ad):
+            """ Returns true iff an ad matches this search.
+            
+            Args:
+                ad: evaluate match with this ad.
+            
+            Returns:
+                True iff the ad matches this search.
+            """
+            for i in range(2):
+                ad_property = ad.properties[i]
+                search_property = self.properties[i]
+                search_negation = self.negations[i]
+                
+                properties_equal = (ad_property == search_property)
+                if search_negation and properties_equal or \
+                    not search_negation and not properties_equal:
+                    return False
+            
+            return True
+        
+        def __str__(self):
+            """ Generates text representation of search.
+            
+            Returns:
+                search represented in natural language.
+            """
+            material, color = self.properties
+            mn, cn = ['not ' if n else '' for n in self.negations]
+            return (f'Searching table that is ' 
+                    f'{mn}{material} and {cn}{color}.')
+    
+    materials = [
+        'made of wood', 'made of metal', 
+        'made of glass', 'made of stone']
+    colors = ['blue', 'red', 'white', 'black']
+    
+    ads = []
+    for material in materials:
+        for color in colors:
+            ad = Ad([material, color])
+            ads.append(ad)
+    
+    searches = []
+    for material in materials:
+        for color in colors:
+            for negations in [
+                [False, False]
+                # , [False, True], 
+                # [True, False], [True, True],
+                ]:
+                properties = [material, color]
+                search = Search(properties, negations)
+                searches.append(search)
+
+    results = []
+    for ad in ads:
+        for search in searches:
+            matches = search.matches(ad)
+            result = {'text1':str(ad), 'text2':str(search), 'joins':matches}
+            results.append(result)
+
+    ads_text = [str(a) for a in ads]
+    search_text = [str(s) for s in searches]
+    pandas.DataFrame({'text':ads_text}).to_csv('testdata/ads.csv')
+    pandas.DataFrame({'text':search_text}).to_csv('testdata/searches.csv')
+    pandas.DataFrame(results).to_csv('testdata/ad_matches_search.csv')
+
+
 if __name__ == '__main__':
     
     inconsistency_benchmark()
     movie_benchmarks()
+    ads_benchmark()
