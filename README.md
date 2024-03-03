@@ -20,4 +20,7 @@ After generating benchmark data, create the `testresults` sub-directory and run 
 ```
 python src/llmjoin/real/run_real [OpenAI Key]
 ```
-Results will be stored in the `testresults` sub-directory after the benchmark completes.
+Results will be stored in the `testresults` sub-directory after the benchmark completes. Finally, run the following command to aggregate benchmark results:
+```
+python src/llmjoin/real/analyze_all testresults
+```
