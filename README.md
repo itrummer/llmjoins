@@ -1,6 +1,6 @@
 # Theta-Joins with Language Models
 
-This repository implements joins with predicates described as free text (e.g., ``ads matching searches'' or ``statements contradicting each other''). The implementation uses large language models such as GPT-4 to determine matches between text inputs. The repository features a simulator, comparing simulated processing fees for different join operators and scenarios, and implementations of real join operators. 
+This repository implements joins with predicates described as free text (e.g., `ads matching searches` or `statements contradicting each other`). The implementation uses large language models such as GPT-4 to determine matches between text inputs. The repository features a simulator, comparing simulated processing fees for different join operators and scenarios, and implementations of real join operators. 
 
 ## Simulation
 
