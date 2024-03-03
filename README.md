@@ -16,7 +16,8 @@ The implementations of the actual join operators are located in the `src/llmjoin
 ```
 python src/llmjoin/real/generate.py
 ```
-After generating benchmark data, run benchmarks with all join operators using the following command (replace `[OpenAI Key]` with your OpenAI key):
+After generating benchmark data, create the `testresults` sub-directory and run benchmarks with all join operators using the following command (replace `[OpenAI Key]` with your OpenAI key):
 ```
 python src/llmjoin/real/run_real [OpenAI Key]
 ```
+Results will be stored in the `testresults` sub-directory after the benchmark completes.
