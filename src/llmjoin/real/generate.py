@@ -63,8 +63,8 @@ def inconsistency_benchmarks():
         'Joe', 'Martin', 'Jane', 'Julia', 'Jeff', 
         'Victor', 'Bob', 'Alice', 'Rosy', 'Bella']
     inconsistency_benchmark(few_names, '')
-    many_names = list(pandas.read_csv('testdata/names.csv')['name'][:100])
-    inconsistency_benchmark(many_names, 'XXL')
+    # many_names = list(pandas.read_csv('testdata/names.csv')['name'][:100])
+    # inconsistency_benchmark(many_names, 'XXL')
 
 
 def movie_benchmarks():

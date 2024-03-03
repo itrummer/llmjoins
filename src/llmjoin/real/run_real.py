@@ -60,10 +60,3 @@ if __name__ == '__main__':
     statements = pandas.read_csv('testdata/statements.csv')
     predicate = 'The two texts contradict each other'
     run_benchmark(client, statements, emails, predicate, 'inconsistency')
-    
-    emails_xxl = pandas.read_csv('testdata/emailsXXL.csv')
-    statements_xxl = pandas.read_csv('testdata/statementsXXL.csv')
-    predicate = 'the two texts contradict each other'
-    run_benchmark(
-        client, statements_xxl, emails_xxl, 
-        predicate, 'inconsistencyXXL', False)
