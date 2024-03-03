@@ -18,9 +18,9 @@ python src/llmjoin/real/generate.py
 ```
 After generating benchmark data, create the `testresults` sub-directory and run benchmarks with all join operators using the following command (replace `[OpenAI Key]` with your OpenAI key, note that you will need to enable billing and have access to GPT-4):
 ```
-python src/llmjoin/real/run_real [OpenAI Key]
+python src/llmjoin/real/run_real.py [OpenAI Key]
 ```
 Results will be stored in the `testresults` sub-directory after the benchmark completes. Finally, run the following command to aggregate benchmark results:
 ```
-python src/llmjoin/real/analyze_all testresults
+python src/llmjoin/real/analyze_all.py testresults
 ```
