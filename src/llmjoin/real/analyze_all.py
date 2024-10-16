@@ -16,10 +16,16 @@ if __name__ == '__main__':
     parser.add_argument('dir', type=str, help='Path to result directory')
     args = parser.parse_args()
 
-    for op_name in ['tuple_join', 'block_join', 'adaptive_join']:
+    for op_name in [
+        'tuple_join', 'block_join', 
+        'adaptive_join', 'embedding_join']:
         for scenario, ref_name in [
             ('inconsistency', 'inconsistencies.csv'),
-            ('inconsistencyXXL', 'inconsistenciesXXL.csv'),
+            ('inconsistency50names', 'inconsistencies50names.csv'),
+            ('inconsistency100names', 'inconsistencies100names.csv'),
+            ('inconsistency150names', 'inconsistencies150names.csv'),
+            ('inconsistency200names', 'inconsistencies200names.csv'),
+            ('inconsistency250names', 'inconsistencies250names.csv'),
             ('same_review', 'same_reviews.csv'),
             ('ad_matches', 'ad_matches_search.csv')]:
 

@@ -37,7 +37,8 @@ def analyze_results(reference, results):
     nr_results = len(results)
     recall = nr_correct/nr_refs
     precision = nr_correct/nr_results
-    f1_score = 2 * precision * recall / (precision+recall)
+    f1_score = 0 if precision == 0 or recall == 0 else \
+        2 * precision * recall / (precision+recall)
     
     print(f'Recall:   \t{recall}')
     print(f'Precision:\t{precision}')
@@ -53,7 +54,8 @@ def analyze_stats(stats):
     seconds = stats['seconds'].sum()
     tokens_read = stats['tokens_read'].sum()
     tokens_written = stats['tokens_written'].sum()
-    dollars = tokens_read * 0.03/1000 + tokens_written * 0.06/1000
+    gpt4_USD = tokens_read * 0.03/1000 + tokens_written * 0.06/1000
+    text3_USD = (tokens_read + tokens_written) * 0.02/1000000
     if 'overflow' in stats.columns:
         nr_prompts = len(stats[stats['overflow'] == False])
     else:
@@ -62,7 +64,8 @@ def analyze_stats(stats):
     print(f'Tokens read:   \t{tokens_read}')
     print(f'Tokens written:\t{tokens_written}')
     print(f'Seconds:       \t{seconds}')
-    print(f'Dollars:       \t{dollars}')
+    print(f'GPT-4 $:       \t{gpt4_USD}')
+    print(f'Text-3 $:       \t{text3_USD}')
     print(f'#Prompts:      \t:{nr_prompts}')
 
 

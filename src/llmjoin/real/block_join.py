@@ -11,7 +11,11 @@ from llmjoin.common.tuning import optimal_block_size
 
 encoder = tiktoken.encoding_for_model('gpt-4')
 #t = 4096
+# Prior
 t = 2000
+t = 8000
+t = 4000
+# t = 4000
 
 
 def token_size(text):

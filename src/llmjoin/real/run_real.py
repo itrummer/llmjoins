@@ -6,12 +6,13 @@ Created on Feb 25, 2024
 import argparse
 from llmjoin.real.adaptive_join import adaptive_join
 from llmjoin.real.block_join import block_join
+from llmjoin.real.embedding_join import embedding_join
 from llmjoin.real.tuple_join import tuple_join
 import openai
 import pandas
 
 
-def run_benchmark(client, df1, df2, predicate, scenario, run_tnlj=True):
+def run_benchmark(client, df1, df2, predicate, scenario):
     """ Benchmark join algorithms in given scenario.
     
     Args:
@@ -20,11 +21,13 @@ def run_benchmark(client, df1, df2, predicate, scenario, run_tnlj=True):
         df2: right join input.
         predicate: join predicate.
         scenario: scenario name (used in names of output files).
-        run_tnlj: whether to run tuple nested loops join (expensive).
     """
-    named_ops = [(adaptive_join, 'adaptive_join'), (block_join, 'block_join'),]
-    if run_tnlj:
-        named_ops.append((tuple_join, 'tuple_join'))
+    named_ops = [
+        # (adaptive_join, 'adaptive_join'), 
+        #(block_join, 'block_join'),
+        (embedding_join, 'embedding_join'),
+        #(tuple_join, 'tuple_join'),
+        ]
         
     for join_op, op_name in named_ops:
         statistics, result = join_op(
@@ -43,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument('ai_key', type=str, help='OpenAI access key')
     args = parser.parse_args()
     
-    client = openai.OpenAI(api_key=args.ai_key, timeout=30)
+    client = openai.OpenAI(api_key=args.ai_key, timeout=300)
     model = 'gpt-4'
     
     ads = pandas.read_csv('testdata/ads.csv')
@@ -60,3 +63,16 @@ if __name__ == '__main__':
     statements = pandas.read_csv('testdata/statements.csv')
     predicate = 'The two texts contradict each other'
     run_benchmark(client, statements, emails, predicate, 'inconsistency')
+    
+    # for nr_names in [
+        # 50,
+        # 100,
+        # 150,
+        # 200,
+        # 250 
+        # ]:
+        # emails = pandas.read_csv(f'testdata/emails{nr_names}names.csv')
+        # statements = pandas.read_csv(f'testdata/statements{nr_names}names.csv')
+        # predicate = 'The two texts contradict each other'
+        # scenario = f'inconsistency{nr_names}names'
+        # run_benchmark(client, statements, emails, predicate, scenario)
